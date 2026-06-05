@@ -46,9 +46,9 @@ const imageCandidate = (product) => {
 const visual = (product, className) => {
   const src = imageCandidate(product);
   if (!src) {
-    return `<div class="${className}" aria-hidden="true">${productInitial(product)}</div>`;
+    return `<div class="${className}" aria-hidden="true"><span>${productInitial(product)}</span></div>`;
   }
-  return `<div class="${className}"><img src="${src}" alt="${escapeHtml(text(product.title, "商品画像"))}" loading="lazy" onerror="this.parentElement.textContent='${productInitial(product)}';"></div>`;
+  return `<div class="${className}"><img src="${src}" alt="${escapeHtml(text(product.title, "商品画像"))}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${productInitial(product)}</span>';" /></div>`;
 };
 
 const escapeHtml = (value) =>
@@ -65,12 +65,22 @@ const setStatus = (message) => {
   if (node) node.textContent = message;
 };
 
+const paymentState = (product) => {
+  if (product.stripe_payment_link) {
+    return { label: "Stripe対応", className: "payment-stripe", action: "Stripeで購入" };
+  }
+  if (product.booth_url) {
+    return { label: "BOOTH", className: "payment-booth", action: "BOOTHで見る" };
+  }
+  return { label: "準備中", className: "payment-preparing", action: "準備中" };
+};
+
 const purchaseAction = (product) => {
   if (product.stripe_payment_link) {
     return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`;
   }
   if (product.booth_url) {
-    return `<a class="action-link primary" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
+    return `<a class="action-link primary booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
   }
   return `<span class="action-link" aria-disabled="true">準備中</span>`;
 };
@@ -87,6 +97,7 @@ async function loadProducts() {
 function productCard(product) {
   const detailUrl = `/product/?id=${encodeURIComponent(product.id)}`;
   const action = purchaseAction(product);
+  const payment = paymentState(product);
 
   return `
     <article class="product-card">
@@ -95,6 +106,7 @@ function productCard(product) {
         <div class="meta-row">
           <span class="pill">${escapeHtml(typeLabel(product.type))}</span>
           <span class="pill">${escapeHtml(text(product.category, "カテゴリ未設定"))}</span>
+          <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
         </div>
         <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
         <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
@@ -115,7 +127,7 @@ function renderList() {
   const products = state.products.filter((item) => state.filteredType === "all" || item.type === state.filteredType);
   grid.innerHTML = products.map(productCard).join("");
 
-  const suffix = state.doNotEdit ? " generated JSON / 手編集禁止" : " generated JSON";
+  const suffix = state.doNotEdit ? "generated JSON / 手編集禁止" : "generated JSON";
   setStatus(`${products.length}件を表示中（全${state.products.length}件 / ${suffix}）`);
 }
 
@@ -162,6 +174,7 @@ function renderDetail() {
 
   document.title = `${text(product.title)} | DAKE Store`;
   const action = purchaseAction(product);
+  const payment = paymentState(product);
   const release = product.github_release_url
     ? `<a class="action-link" href="${escapeHtml(product.github_release_url)}" rel="noopener" target="_blank">GitHub Release</a>`
     : "";
@@ -172,22 +185,26 @@ function renderDetail() {
       <div class="meta-row">
         <span class="pill">${escapeHtml(typeLabel(product.type))}</span>
         <span class="pill">${escapeHtml(text(product.category, "カテゴリ未設定"))}</span>
+        <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
       </div>
       <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
       <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
       <div class="detail-actions">${action}${release}</div>
-      <p class="source-note">購入後のダウンロード案内は商品ごとの案内に従ってください。現在、一部商品はBOOTH導線またはGitHub Releaseでの配布を併用しています。</p>
+      <p class="purchase-note">購入後のダウンロード案内は商品ごとの案内に従ってください。現在、一部商品はBOOTH導線またはGitHub Releaseでの配布を併用しています。</p>
       <ul class="detail-list">
         <li><b>説明</b>${escapeHtml(text(product.description, "説明準備中"))}</li>
+        <li><b>購入導線</b>${escapeHtml(payment.action)}</li>
         <li><b>payment_status</b>${escapeHtml(text(product.payment_status, "preparing"))}</li>
-        <li><b>Stripe Payment Link</b>${escapeHtml(product.stripe_payment_link ? "設定あり" : "未設定")}</li>
         <li><b>BOOTH URL</b>${escapeHtml(text(product.booth_url, "準備中"))}</li>
         <li><b>GitHub Release</b>${escapeHtml(text(product.github_release_url, "未設定"))}</li>
         <li><b>download_url</b>${escapeHtml(text(product.download_url, "未確定"))}</li>
       </ul>
       <div class="tag-list">${(product.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
-      <p class="source-note">source_original: ${escapeHtml(text(product.source_original, "未設定"))}</p>
+      <details class="source-note">
+        <summary>管理情報</summary>
+        <span>source_original: ${escapeHtml(text(product.source_original, "未設定"))}</span>
+      </details>
     </section>
   `;
   setStatus("商品詳細を表示しています。");

@@ -71,3 +71,11 @@ The static MVP includes the minimum legal and policy pages for public sales in J
 The pages keep personal contact details minimal for safety. Address, phone number, and contact details are disclosed without delay when legally required or requested through the appropriate purchase/support path.
 
 Stripe handles payment processing. DAKE Store does not store credit card numbers and does not maintain a purchaser database in the static MVP.
+## Presentation Polish
+
+Phase 9 adjusted the public Store presentation layer only.
+
+- Product data still comes from `store_products.generated.json`.
+- Product names, prices, descriptions, Stripe URLs, and BOOTH URLs are not hand-edited in this repo.
+- Purchase actions are rendered in this priority: Stripe Payment Link, BOOTH, preparing.
+- Footer navigation links `/legal/`, `/privacy/`, and `/terms/` are present across the Store pages.

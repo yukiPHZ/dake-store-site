@@ -9,6 +9,10 @@
   --strong: #111515;
   --accent: #0f766e;
   --accent-soft: #dcefed;
+  --booth: #7b5e2e;
+  --booth-soft: #f1eadf;
+  --prepare: #6c7280;
+  --prepare-soft: #eceef2;
   --shadow: 0 14px 36px rgba(28, 40, 40, 0.08);
 }
 
@@ -16,9 +20,14 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
@@ -63,7 +72,7 @@ p {
 h1 {
   margin: 0;
   color: var(--strong);
-  font-size: clamp(36px, 8vw, 68px);
+  font-size: 56px;
   line-height: 1;
   letter-spacing: 0;
 }
@@ -75,10 +84,11 @@ h1 {
   font-size: 18px;
 }
 
-.site-nav {
+.site-nav,
+.footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 10px 14px;
 }
 
 .site-nav a,
@@ -107,6 +117,11 @@ h1 {
   border-color: var(--accent);
   background: var(--accent);
   color: #ffffff;
+}
+
+.action-link.primary.booth {
+  border-color: var(--booth);
+  background: var(--booth);
 }
 
 .intro {
@@ -155,10 +170,22 @@ h1 {
   display: grid;
   place-items: center;
   min-height: 210px;
+  aspect-ratio: 16 / 11;
   background: linear-gradient(180deg, #ffffff 0%, var(--surface-soft) 100%);
   color: var(--accent);
   font-size: 42px;
   font-weight: 800;
+}
+
+.product-visual span,
+.detail-visual span {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #ffffff;
 }
 
 .product-visual img,
@@ -191,6 +218,21 @@ h1 {
   font-size: 12px;
   font-weight: 700;
   padding: 4px 10px;
+}
+
+.payment-pill.payment-stripe {
+  background: #dfeff1;
+  color: #104e57;
+}
+
+.payment-pill.payment-booth {
+  background: var(--booth-soft);
+  color: var(--booth);
+}
+
+.payment-pill.payment-preparing {
+  background: var(--prepare-soft);
+  color: var(--prepare);
 }
 
 .price {
@@ -232,7 +274,8 @@ h1 {
   padding: 28px 0 64px;
 }
 
-.detail-panel {
+.detail-panel,
+.legal-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -240,11 +283,23 @@ h1 {
   padding: 24px;
 }
 
+.legal-panel {
+  margin: 20px 0 64px;
+}
+
 .detail-panel h2 {
   margin: 0 0 12px;
   color: var(--strong);
-  font-size: clamp(28px, 5vw, 44px);
+  font-size: 38px;
   line-height: 1.14;
+}
+
+.purchase-note {
+  border-left: 3px solid var(--line);
+  margin: 16px 0 0;
+  padding-left: 12px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .detail-list {
@@ -279,36 +334,9 @@ h1 {
   font-size: 12px;
 }
 
-.site-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  border-top: 1px solid var(--line);
-  padding: 22px 0 34px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-@media (max-width: 760px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-top: 32px;
-  }
-
-  .product-detail {
-    grid-template-columns: 1fr;
-  }
-
-  .site-footer {
-    flex-direction: column;
-  }
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 14px;
+.source-note summary {
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .footer-links a {
@@ -320,13 +348,15 @@ h1 {
   text-decoration: underline;
 }
 
-.legal-panel {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  margin: 20px 0 64px;
-  padding: 24px;
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+  padding: 22px 0 34px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .legal-list {
@@ -372,6 +402,37 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-top: 32px;
+  }
+
+  h1 {
+    font-size: 42px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-panel h2 {
+    font-size: 30px;
+  }
+
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .legal-list div {
     grid-template-columns: 1fr;
     gap: 4px;
