@@ -9,23 +9,19 @@
   <body>
     <header class="site-header">
       <div>
-        <p class="eyebrow">ORIGINAL.md derived catalog</p>
+        <p class="eyebrow">PEAKHEADZ</p>
         <h1>DAKE Store</h1>
         <p class="lead">小さな実務道具を、必要な分だけ。</p>
       </div>
       <nav class="site-nav" aria-label="Store navigation">
         <a href="/">Store</a>
-        <a href="/products/">Products</a>
+        <a href="/products/">一覧</a>
       </nav>
     </header>
 
     <main>
       <section class="intro">
-        <p>
-          商品情報は各商品の <code>ORIGINAL.md</code> から生成された
-          <code>store_products.generated.json</code> を読み込んでいます。
-          Storeは正本ではなく、販売用ビューです。
-        </p>
+        <p>PDF、画像、メモ、作業補助。日々のパソコン作業を少し軽くするためのDAKEツールを置いています。</p>
       </section>
 
       <section class="toolbar" aria-label="Product filters">
@@ -36,21 +32,23 @@
       </section>
 
       <section aria-live="polite">
-        <div id="store-status" class="status-line">商品情報を読み込んでいます。</div>
+        <div id="store-status" class="status-line">商品を読み込んでいます。</div>
         <div id="product-grid" class="product-grid"></div>
       </section>
     </main>
-
     <footer class="site-footer">
-      <span>PEAKHEADZ</span>
+      <div class="footer-brand">
+        <span>DAKE Store</span>
+        <strong>ただ、止まらない。</strong>
+        <span>by PEAKHEADZ</span>
+      </div>
       <nav class="footer-links" aria-label="Legal navigation">
         <a href="/legal/">特定商取引法に基づく表記</a>
         <a href="/privacy/">プライバシーポリシー</a>
         <a href="/terms/">利用規約</a>
       </nav>
-      <span>DAKE Store MVP</span>
+      <span class="copyright">© PEAKHEADZ</span>
     </footer>
-
     <script src="/assets/js/store.js"></script>
   </body>
 </html>

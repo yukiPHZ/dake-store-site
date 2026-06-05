@@ -79,3 +79,12 @@ Phase 9 adjusted the public Store presentation layer only.
 - Product names, prices, descriptions, Stripe URLs, and BOOTH URLs are not hand-edited in this repo.
 - Purchase actions are rendered in this priority: Stripe Payment Link, BOOTH, preparing.
 - Footer navigation links `/legal/`, `/privacy/`, and `/terms/` are present across the Store pages.
+
+## Visual Tone Refinement
+
+The public Store UI is kept close to DAKE's quiet white/black presentation.
+
+- Top-page internal source wording is not shown to general users.
+- Product cards keep images and tags in separate normal-flow areas.
+- Product detail pages avoid exposing internal fields such as payment status, raw payment links, download URLs, and source paths.
+- Purchase actions remain data-driven: Stripe Payment Link, BOOTH, then preparing.

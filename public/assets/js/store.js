@@ -43,6 +43,13 @@ const imageCandidate = (product) => {
   return "";
 };
 
+const escapeHtml = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
 const visual = (product, className) => {
   const src = imageCandidate(product);
   if (!src) {
@@ -50,13 +57,6 @@ const visual = (product, className) => {
   }
   return `<div class="${className}"><img src="${src}" alt="${escapeHtml(text(product.title, "商品画像"))}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${productInitial(product)}</span>';" /></div>`;
 };
-
-const escapeHtml = (value) =>
-  String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
 
 const statusLine = () => document.querySelector("#store-status");
 
@@ -80,9 +80,15 @@ const purchaseAction = (product) => {
     return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`;
   }
   if (product.booth_url) {
-    return `<a class="action-link primary booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
+    return `<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
   }
-  return `<span class="action-link" aria-disabled="true">準備中</span>`;
+  return `<span class="action-link is-disabled" aria-disabled="true">準備中</span>`;
+};
+
+const tagList = (tags, className = "tag-list") => {
+  const values = Array.isArray(tags) ? tags.filter(Boolean) : [];
+  if (!values.length) return "";
+  return `<div class="${className}">${values.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>`;
 };
 
 async function loadProducts() {
@@ -126,9 +132,7 @@ function renderList() {
 
   const products = state.products.filter((item) => state.filteredType === "all" || item.type === state.filteredType);
   grid.innerHTML = products.map(productCard).join("");
-
-  const suffix = state.doNotEdit ? "generated JSON / 手編集禁止" : "generated JSON";
-  setStatus(`${products.length}件を表示中（全${state.products.length}件 / ${suffix}）`);
+  setStatus(`${products.length}件を表示中`);
 }
 
 function setupFilters() {
@@ -175,9 +179,8 @@ function renderDetail() {
   document.title = `${text(product.title)} | DAKE Store`;
   const action = purchaseAction(product);
   const payment = paymentState(product);
-  const release = product.github_release_url
-    ? `<a class="action-link" href="${escapeHtml(product.github_release_url)}" rel="noopener" target="_blank">GitHub Release</a>`
-    : "";
+  const tags = tagList(product.tags);
+  const disclaimer = text(product.disclaimer, "各ツールは作業補助を目的としたものです。重要なファイルは事前にバックアップしてください。");
 
   detail.innerHTML = `
     ${visual(product, "detail-visual")}
@@ -188,23 +191,17 @@ function renderDetail() {
         <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
       </div>
       <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
-      <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
+      <p class="detail-catch">${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
-      <div class="detail-actions">${action}${release}</div>
-      <p class="purchase-note">購入後のダウンロード案内は商品ごとの案内に従ってください。現在、一部商品はBOOTH導線またはGitHub Releaseでの配布を併用しています。</p>
-      <ul class="detail-list">
-        <li><b>説明</b>${escapeHtml(text(product.description, "説明準備中"))}</li>
-        <li><b>購入導線</b>${escapeHtml(payment.action)}</li>
-        <li><b>payment_status</b>${escapeHtml(text(product.payment_status, "preparing"))}</li>
-        <li><b>BOOTH URL</b>${escapeHtml(text(product.booth_url, "準備中"))}</li>
-        <li><b>GitHub Release</b>${escapeHtml(text(product.github_release_url, "未設定"))}</li>
-        <li><b>download_url</b>${escapeHtml(text(product.download_url, "未確定"))}</li>
-      </ul>
-      <div class="tag-list">${(product.tags || []).map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>
-      <details class="source-note">
-        <summary>管理情報</summary>
-        <span>source_original: ${escapeHtml(text(product.source_original, "未設定"))}</span>
-      </details>
+      ${tags}
+      <div class="detail-actions">${action}</div>
+      <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。一部の商品はBOOTHでの配布を併用しています。</p>
+      <div class="detail-copy">
+        <h3>説明</h3>
+        <p>${escapeHtml(text(product.description, "説明準備中"))}</p>
+        <h3>注意事項</h3>
+        <p>${escapeHtml(disclaimer)}</p>
+      </div>
     </section>
   `;
   setStatus("商品詳細を表示しています。");
