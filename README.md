@@ -88,3 +88,12 @@ The public Store UI is kept close to DAKE's quiet white/black presentation.
 - Product cards keep images and tags in separate normal-flow areas.
 - Product detail pages avoid exposing internal fields such as payment status, raw payment links, download URLs, and source paths.
 - Purchase actions remain data-driven: Stripe Payment Link, BOOTH, then preparing.
+## Visual Layout Refinement
+
+The Store presentation keeps a quiet shelf layout rather than a sales landing page.
+
+- Header labels and redundant top navigation are not shown on the main Store views.
+- Product cards use a 4 / 2 / 1 column shelf layout across desktop, tablet, and mobile.
+- Product screenshots are contained without cropping or stretching.
+- Tags and badges stay below the image area in normal document flow.
+- Product data, generated JSON, prices, Stripe links, and BOOTH links are not edited in this repo.
