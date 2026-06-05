@@ -177,6 +177,7 @@ function renderDetail() {
       <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
       <div class="detail-actions">${action}${release}</div>
+      <p class="source-note">購入後のダウンロード案内は商品ごとの案内に従ってください。現在、一部商品はBOOTH導線またはGitHub Releaseでの配布を併用しています。</p>
       <ul class="detail-list">
         <li><b>説明</b>${escapeHtml(text(product.description, "説明準備中"))}</li>
         <li><b>payment_status</b>${escapeHtml(text(product.payment_status, "preparing"))}</li>

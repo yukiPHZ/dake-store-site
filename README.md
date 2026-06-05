@@ -48,3 +48,15 @@ The custom domain is added from the Cloudflare Pages project settings after the 
 - `wrangler.toml`: `pages_build_output_dir = "public"`
 
 `wrangler.toml` keeps the Pages output directory explicit.
+## Purchase Operations
+
+MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION_RULE.md`.
+
+- Stripe Payment Link is the current Stripe path.
+- Products without Stripe keep BOOTH links when available.
+- Products without Stripe or BOOTH remain in preparing state.
+- Automatic post-purchase `download_url` issuing is not implemented yet.
+- GitHub Release and BOOTH may be used together as download or distribution guidance.
+- Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
+
+Do not place Stripe Secret Key, Webhook Secret, or API keys in this static site.
