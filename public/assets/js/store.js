@@ -130,12 +130,29 @@ function setupFilters() {
   });
 }
 
+const sourceFolder = (product) => {
+  const source = product.source_original || "";
+  const parts = source.replaceAll("\\", "/").split("/");
+  const originalIndex = parts.lastIndexOf("ORIGINAL.md");
+  if (originalIndex > 0) return parts[originalIndex - 1];
+  return "";
+};
+
+const findProduct = (id) => {
+  if (!id) return null;
+  return (
+    state.products.find((item) => item.id === id) ||
+    state.products.find((item) => sourceFolder(item) === id) ||
+    null
+  );
+};
+
 function renderDetail() {
   const detail = document.querySelector("#product-detail");
   if (!detail) return;
 
   const id = new URLSearchParams(location.search).get("id");
-  const product = state.products.find((item) => item.id === id);
+  const product = findProduct(id);
 
   if (!id || !product) {
     setStatus("商品が見つかりませんでした。");
