@@ -60,3 +60,14 @@ MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION
 - Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
 
 Do not place Stripe Secret Key, Webhook Secret, or API keys in this static site.
+## Legal Pages
+
+The static MVP includes the minimum legal and policy pages for public sales in Japan.
+
+- `/legal/`: Specified Commercial Transactions Act notice
+- `/privacy/`: Privacy policy
+- `/terms/`: Terms, refund, cancellation, and support policy
+
+The pages keep personal contact details minimal for safety. Address, phone number, and contact details are disclosed without delay when legally required or requested through the appropriate purchase/support path.
+
+Stripe handles payment processing. DAKE Store does not store credit card numbers and does not maintain a purchaser database in the static MVP.
