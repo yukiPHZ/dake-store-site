@@ -93,7 +93,9 @@ The public Store UI is kept close to DAKE's quiet white/black presentation.
 The Store presentation keeps a quiet shelf layout rather than a sales landing page.
 
 - Header labels and redundant top navigation are not shown on the main Store views.
+- The `DAKE Store` title links quietly back to `/`.
 - Product cards use a 4 / 2 / 1 column shelf layout across desktop, tablet, and mobile.
 - Product screenshots are contained without cropping or stretching.
 - Tags and badges stay below the image area in normal document flow.
+- Footer links keep legal pages and quiet DAKE network links separate.
 - Product data, generated JSON, prices, Stripe links, and BOOTH links are not edited in this repo.
