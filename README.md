@@ -30,9 +30,21 @@ The MVP prefers Stripe Payment Link before adding Checkout API or Pages Function
 - Stripe Secret Key must never be placed in this static site.
 - Pages Functions, Checkout API, Webhook, R2, and post-purchase downloads are later phases.
 
+## Repository And Deployment
+
+- GitHub repo: https://github.com/yukiPHZ/dake-store-site
+- Cloudflare Pages project: `dake-store-site`
+- Production branch: `main`
+- Build command: blank
+- Build output directory: `public`
+- Custom domain: `store.dakeapp.com`
+
+The custom domain is added from the Cloudflare Pages project settings after the project is connected to GitHub.
+
 ## Cloudflare Pages
 
 - Build command: none
 - Build output directory: `public`
+- `wrangler.toml`: `pages_build_output_dir = "public"`
 
 `wrangler.toml` keeps the Pages output directory explicit.
