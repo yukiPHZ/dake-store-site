@@ -20,6 +20,16 @@ This site is not the source of truth. Product information is derived from each p
 - No Cloudflare Pages Functions yet
 - No direct download URL issuing yet
 
+## Stripe Payment Link
+
+The MVP prefers Stripe Payment Link before adding Checkout API or Pages Functions.
+
+- `stripe_payment_link` is read from generated JSON.
+- Products without `stripe_payment_link` keep the BOOTH link when available.
+- Products without Stripe or BOOTH are shown as preparing.
+- Stripe Secret Key must never be placed in this static site.
+- Pages Functions, Checkout API, Webhook, R2, and post-purchase downloads are later phases.
+
 ## Cloudflare Pages
 
 - Build command: none

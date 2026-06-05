@@ -65,6 +65,16 @@ const setStatus = (message) => {
   if (node) node.textContent = message;
 };
 
+const purchaseAction = (product) => {
+  if (product.stripe_payment_link) {
+    return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`;
+  }
+  if (product.booth_url) {
+    return `<a class="action-link primary" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
+  }
+  return `<span class="action-link" aria-disabled="true">準備中</span>`;
+};
+
 async function loadProducts() {
   const response = await fetch(DATA_URL, { cache: "no-store" });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -76,9 +86,7 @@ async function loadProducts() {
 
 function productCard(product) {
   const detailUrl = `/product/?id=${encodeURIComponent(product.id)}`;
-  const booth = product.booth_url
-    ? `<a class="action-link primary" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`
-    : `<span class="action-link" aria-disabled="true">準備中</span>`;
+  const action = purchaseAction(product);
 
   return `
     <article class="product-card">
@@ -93,7 +101,7 @@ function productCard(product) {
         <div class="price">${escapeHtml(yen(product.price))}</div>
         <div class="card-actions">
           <a class="action-link" href="${detailUrl}">詳細</a>
-          ${booth}
+          ${action}
         </div>
       </div>
     </article>
@@ -136,9 +144,7 @@ function renderDetail() {
   }
 
   document.title = `${text(product.title)} | DAKE Store`;
-  const booth = product.booth_url
-    ? `<a class="action-link primary" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`
-    : `<span class="action-link" aria-disabled="true">準備中</span>`;
+  const action = purchaseAction(product);
   const release = product.github_release_url
     ? `<a class="action-link" href="${escapeHtml(product.github_release_url)}" rel="noopener" target="_blank">GitHub Release</a>`
     : "";
@@ -153,9 +159,11 @@ function renderDetail() {
       <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
       <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
-      <div class="detail-actions">${booth}${release}</div>
+      <div class="detail-actions">${action}${release}</div>
       <ul class="detail-list">
         <li><b>説明</b>${escapeHtml(text(product.description, "説明準備中"))}</li>
+        <li><b>payment_status</b>${escapeHtml(text(product.payment_status, "preparing"))}</li>
+        <li><b>Stripe Payment Link</b>${escapeHtml(product.stripe_payment_link ? "設定あり" : "未設定")}</li>
         <li><b>BOOTH URL</b>${escapeHtml(text(product.booth_url, "準備中"))}</li>
         <li><b>GitHub Release</b>${escapeHtml(text(product.github_release_url, "未設定"))}</li>
         <li><b>download_url</b>${escapeHtml(text(product.download_url, "未確定"))}</li>
