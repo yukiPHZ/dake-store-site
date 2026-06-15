@@ -76,13 +76,24 @@ const paymentState = (product) => {
 };
 
 const purchaseAction = (product) => {
+  const links = [];
   if (product.stripe_payment_link) {
-    return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`;
+    links.push(`<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`);
   }
   if (product.booth_url) {
-    return `<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`;
+    links.push(`<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`);
   }
+  if (links.length) return links.join("");
   return `<span class="action-link is-disabled" aria-disabled="true">準備中</span>`;
+};
+
+const manualDeliveryNotice = (product) => {
+  if (product.type !== "pack" || !product.stripe_payment_link) return "";
+  return `
+    <p class="purchase-note">
+      このPackは自動ダウンロードではありません。Stripe決済確認後、購入時のメールアドレス宛に次営業日以内にダウンロード方法をご案内します。
+    </p>
+  `;
 };
 
 const tagList = (tags, className = "tag-list") => {
@@ -195,6 +206,7 @@ function renderDetail() {
       <div class="price">${escapeHtml(yen(product.price))}</div>
       ${tags}
       <div class="detail-actions">${action}</div>
+      ${manualDeliveryNotice(product)}
       <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。一部の商品はBOOTHでの配布を併用しています。</p>
       <div class="detail-copy">
         <h3>説明</h3>
