@@ -1,7 +1,9 @@
 const DATA_URL = "/assets/data/store_products.generated.json";
+const APPS_DATA_URL = "/assets/data/apps.generated.json";
 
 const state = {
   products: [],
+  apps: [],
   filteredType: "all",
   sourcePolicy: "",
   doNotEdit: false,
@@ -111,6 +113,17 @@ async function loadProducts() {
   state.products = (data.items || []).filter((item) => item.status === "available");
 }
 
+async function loadApps() {
+  try {
+    const response = await fetch(APPS_DATA_URL, { cache: "no-store" });
+    if (!response.ok) return;
+    const data = await response.json();
+    state.apps = Array.isArray(data.apps) ? data.apps : [];
+  } catch (_error) {
+    state.apps = [];
+  }
+}
+
 function productCard(product) {
   const detailUrl = `/product/?id=${encodeURIComponent(product.id)}`;
   const action = purchaseAction(product);
@@ -165,6 +178,39 @@ const sourceFolder = (product) => {
   return "";
 };
 
+const normalizeKey = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^a-z0-9]+/g, "");
+
+const findAppForProduct = (product) => {
+  if (!product || product.type !== "app") return null;
+  const productKeys = [
+    product.source_original,
+    sourceFolder(product),
+    product.id,
+  ].map(normalizeKey);
+
+  return (
+    state.apps.find((app) => {
+      const appKeys = [
+        app.source_original,
+        app.folder_name,
+        app.app_key,
+        app.slug,
+      ].map(normalizeKey);
+      return productKeys.some((key) => key && appKeys.includes(key));
+    }) || null
+  );
+};
+
+const detailAction = (product) => {
+  const app = findAppForProduct(product);
+  if (!app || !app.detail_url) return "";
+  return `<a class="action-link" href="${escapeHtml(app.detail_url)}">Detail</a>`;
+};
+
 const findProduct = (id) => {
   if (!id) return null;
   return (
@@ -189,6 +235,7 @@ function renderDetail() {
 
   document.title = `${text(product.title)} | DAKE Store`;
   const action = purchaseAction(product);
+  const detailLink = detailAction(product);
   const payment = paymentState(product);
   const tags = tagList(product.tags);
   const disclaimer = text(product.disclaimer, "各ツールは作業補助を目的としたものです。重要なファイルは事前にバックアップしてください。");
@@ -205,7 +252,7 @@ function renderDetail() {
       <p class="detail-catch">${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
       ${tags}
-      <div class="detail-actions">${action}</div>
+      <div class="detail-actions">${detailLink}${action}</div>
       ${manualDeliveryNotice(product)}
       <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。一部の商品はBOOTHでの配布を併用しています。</p>
       <div class="detail-copy">
@@ -222,6 +269,7 @@ function renderDetail() {
 async function main() {
   try {
     await loadProducts();
+    await loadApps();
     setupFilters();
     renderList();
     renderDetail();
