@@ -37,6 +37,36 @@ const productInitial = (product) => {
   return title.replace(/^Dake/i, "").trim().slice(0, 2) || "D";
 };
 
+const safeProductId = (product) => {
+  const value = product && product.id;
+  const normalized = String(value || "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80);
+  return /^[a-z][a-z0-9_]{2,79}$/.test(normalized) ? normalized : "";
+};
+
+const itemCategory = (product) => {
+  const normalized = String((product && product.type) || "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 64);
+  return /^[a-z][a-z0-9_-]{1,63}$/.test(normalized) ? normalized : "";
+};
+
+const marketObserverProductAttrs = (product) => {
+  const productId = safeProductId(product);
+  const category = itemCategory(product);
+  const attrs = [];
+  if (productId) attrs.push(`data-market-observer-product-id="${escapeHtml(productId)}"`);
+  if (category) attrs.push(`data-market-observer-item-category="${escapeHtml(category)}"`);
+  return attrs.join(" ");
+};
+
 const imageCandidate = (product) => {
   const src = product.thumbnail || product.image;
   if (!src) return "";
@@ -79,11 +109,12 @@ const paymentState = (product) => {
 
 const purchaseAction = (product) => {
   const links = [];
+  const trackingAttrs = marketObserverProductAttrs(product);
   if (product.stripe_payment_link) {
-    links.push(`<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank">Stripeで購入</a>`);
+    links.push(`<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank" ${trackingAttrs}>Stripeで購入</a>`);
   }
   if (product.booth_url) {
-    links.push(`<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank">BOOTHで見る</a>`);
+    links.push(`<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank" ${trackingAttrs}>BOOTHで見る</a>`);
   }
   if (links.length) return links.join("");
   return `<span class="action-link is-disabled" aria-disabled="true">準備中</span>`;
@@ -128,9 +159,10 @@ function productCard(product) {
   const detailUrl = `/product/?id=${encodeURIComponent(product.id)}`;
   const action = purchaseAction(product);
   const payment = paymentState(product);
+  const trackingAttrs = marketObserverProductAttrs(product);
 
   return `
-    <article class="product-card">
+    <article class="product-card" ${trackingAttrs}>
       ${visual(product, "product-visual")}
       <div class="product-body">
         <div class="meta-row">
@@ -142,7 +174,7 @@ function productCard(product) {
         <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
         <div class="price">${escapeHtml(yen(product.price))}</div>
         <div class="card-actions">
-          <a class="action-link" href="${detailUrl}">詳細</a>
+          <a class="action-link" href="${detailUrl}" data-market-observer-event="select_item" ${trackingAttrs}>詳細</a>
           ${action}
         </div>
       </div>
@@ -264,6 +296,7 @@ function renderDetail() {
     </section>
   `;
   setStatus("商品詳細を表示しています。");
+  window.DakeStoreMarketObserver?.trackViewItem(product);
 }
 
 async function main() {
