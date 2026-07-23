@@ -1,0 +1,32 @@
+{
+  "generated_at_utc": "2026-07-23T13:31:44Z",
+  "managed_file_checksums": {
+    "README.md": "5e850f8c551f8ba0f791169d7afd0b8331cc551e7373acae2953eda0eb6140a4",
+    "consent-banner.js": "53b7f06977cf2a72e2b66ec326268a9721acb42362414d4fa70437dd6d65813e",
+    "generated/dake_store.profile.json": "f5bbe8b824eb360f6ade9a61721baa6ef04274add2cfbab7947cb1a7c73cde18",
+    "generated/manifest.json": "a32d62bb37824aca43c6b9b85f806ebe73b89b214a50d2ec415ce6407fe696d4",
+    "generated/runtime-package.js": "5bcdb5b1b55e2a5ee65644c655590da87909da37cc72527a3f556fcb52be3d75",
+    "generated/runtime_schema.json": "5b067a16bd57a655f3f34febbda25bd5442f6a697983574d1f432458a4c85d22",
+    "market-observer.js": "9fe7dc9020bd5a342b46b2b4c0f622ff25046f66ec73030dedb967c98f9e11de"
+  },
+  "manifest_checksum": "a32d62bb37824aca43c6b9b85f806ebe73b89b214a50d2ec415ce6407fe696d4",
+  "market_observer_commit": "5777375b8beef1e75409a1f1e7c281706ed2b3e8",
+  "profile_checksums": {
+    "dake_store": "f5bbe8b824eb360f6ade9a61721baa6ef04274add2cfbab7947cb1a7c73cde18"
+  },
+  "project_ids": [
+    "dake_store"
+  ],
+  "repository": "yukiPHZ/dake-store-site",
+  "runtime_checksum": "9fe7dc9020bd5a342b46b2b4c0f622ff25046f66ec73030dedb967c98f9e11de",
+  "runtime_version": "1.0.0",
+  "schema_version": "1.0.0-lite",
+  "site_file_checksums": {
+    "public/assets/js/market-observer-dake-store.js": "780f44614c882fc6c525c5208e5de754f52e6ad99d31d39931223fa0df894c89",
+    "public/assets/js/store.js": "cdea7a7e5d2b2ac36bac575f850846d009b8f983b9496d3257bc75825ee09269",
+    "public/assets/market-observer/dake-store.config.js": "edcedc791985f52f2bec04b41ee78e14cba93e0b7933ca0a077269ea18f23bd2",
+    "public/index.html": "730781dbe98161f3109da86eff062e47402e38128c6f27a826e5cd2b4fd1ed07"
+  },
+  "site_local_overrides": [],
+  "target_id": "dake_store_site"
+}

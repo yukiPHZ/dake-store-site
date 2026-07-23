@@ -44,6 +44,7 @@
       dedupe: new Map(),
       rateLimit: new Map(),
       rateLimitedCount: 0,
+      pageContext: {},
       now: () => Date.now(),
     };
   }
@@ -439,11 +440,12 @@
 
   function init(config) {
     const safeConfig = config || {};
-    const reasons = validateInit(safeConfig);
-    state.blockedReasons = reasons.slice();
     state.config = safeConfig;
     state.runtimeSchema = safeConfig.runtimeSchema || null;
     state.profile = safeConfig.profile || null;
+    state.pageContext = sanitizePageContext(safeConfig.pageContext);
+    const reasons = validateInit(safeConfig);
+    state.blockedReasons = reasons.slice();
     if (reasons.length > 0) {
       state.status = TERMINAL_STATES.has(state.status) ? state.status : "blocked_retryable";
       updateSentinel();
@@ -560,11 +562,24 @@
   }
 
   function pageParams() {
-    return {
+    return Object.assign({}, state.pageContext, {
       page_location: sanitizedLocation(),
       page_referrer: sanitizedReferrer(),
       page_title: state.profile.page_title_alias,
-    };
+    });
+  }
+
+  function sanitizePageContext(value) {
+    if (!state.runtimeSchema || !state.profile) return {};
+    if (unsafeParameterBag(value || {})) return {};
+    const output = {};
+    const allowed = ["route_id", "content_type", "area", "service_type", "intent_cluster", "launch_group", "referrer_type"];
+    for (const key of allowed) {
+      if (!Object.prototype.hasOwnProperty.call(value || {}, key)) continue;
+      const result = sanitizeValue(key, value[key]);
+      if (result.ok) output[key] = result.value;
+    }
+    return output;
   }
 
   function sanitizeParameters(eventName, parameters) {
