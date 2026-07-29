@@ -1,5 +1,12 @@
 # DAKE Store
 
+> Site-specific source of truth: `ORIGINAL.md`  
+> DAKE Network registry: `dakeapp-site/ORIGINAL.md`
+
+Public HTML uses the shared DAKE navigation from `https://dakeapp.com/assets/`
+and keeps a plain `すべてのDAKE` fallback. Run the central installer when adding
+a page: `node ..\dakeapp-site\scripts\apply-dake-network.js public`.
+
 DAKE Store is a static sales-view MVP for DAKE products.
 
 This site is not the source of truth. Product information is derived from each product's `ORIGINAL.md` through `store_products.generated.json`.
