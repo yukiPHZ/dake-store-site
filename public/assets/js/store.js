@@ -270,6 +270,7 @@ function renderDetail() {
   const detailLink = detailAction(product);
   const payment = paymentState(product);
   const tags = tagList(product.tags);
+  const version = nullish(product.version) ? "" : `<span class="pill">v${escapeHtml(text(product.version))}</span>`;
   const disclaimer = text(product.disclaimer, "各ツールは作業補助を目的としたものです。重要なファイルは事前にバックアップしてください。");
 
   detail.innerHTML = `
@@ -278,6 +279,7 @@ function renderDetail() {
       <div class="meta-row">
         <span class="pill">${escapeHtml(typeLabel(product.type))}</span>
         <span class="pill">${escapeHtml(text(product.category, "カテゴリ未設定"))}</span>
+        ${version}
         <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
       </div>
       <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
