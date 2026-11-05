@@ -104,7 +104,10 @@ const paymentState = (product) => {
   if (product.booth_url) {
     return { label: "BOOTH", className: "payment-booth", action: "BOOTHで見る" };
   }
-  return { label: "準備中", className: "payment-preparing", action: "準備中" };
+  if (product.download_url) {
+    return { label: "ダウンロード", className: "payment-booth", action: "取得する" };
+  }
+  return { label: "取得先なし", className: "payment-preparing", action: "取得先なし" };
 };
 
 const purchaseAction = (product) => {
@@ -115,6 +118,9 @@ const purchaseAction = (product) => {
   }
   if (product.booth_url) {
     links.push(`<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank" ${trackingAttrs}>BOOTHで見る</a>`);
+  }
+  if (product.download_url && product.download_url !== product.booth_url && product.download_url !== product.stripe_payment_link) {
+    links.push(`<a class="action-link" href="${escapeHtml(product.download_url)}" rel="noopener" target="_blank" ${trackingAttrs}>取得する</a>`);
   }
   if (links.length) return links.join("");
   return `<span class="action-link is-disabled" aria-disabled="true">準備中</span>`;
@@ -141,7 +147,9 @@ async function loadProducts() {
   const data = await response.json();
   state.sourcePolicy = data.source_policy || "";
   state.doNotEdit = data.do_not_edit === true;
-  state.products = (data.items || []).filter((item) => item.status === "available");
+  state.products = (data.items || []).filter((item) =>
+    item.status === "available" && Boolean(item.stripe_payment_link || item.booth_url || item.download_url)
+  );
 }
 
 async function loadApps() {

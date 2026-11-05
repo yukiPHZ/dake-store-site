@@ -14,6 +14,10 @@ DAKE Store is the quiet distribution and sales shelf for DAKE products. Release
 and BOOTH links remain parallel; the site must not become a loud sales landing
 page.
 
+The public shelf shows only products with a current Stripe, BOOTH, or download
+route. Products that exist in canonical data but cannot yet be purchased or
+obtained stay out of the Store list until a source-confirmed route exists.
+
 ## Technical Boundaries
 
 - The site is static and lives under `public/`.

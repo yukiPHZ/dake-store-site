@@ -33,7 +33,7 @@ The MVP prefers Stripe Payment Link before adding Checkout API or Pages Function
 
 - `stripe_payment_link` is read from generated JSON.
 - Products without `stripe_payment_link` keep the BOOTH link when available.
-- Products without Stripe or BOOTH are shown as preparing.
+- Products without a Stripe, BOOTH, or download route stay in canonical data but are hidden from the public Store shelf.
 - Stripe Secret Key must never be placed in this static site.
 - Pages Functions, Checkout API, Webhook, R2, and post-purchase downloads are later phases.
 
@@ -61,7 +61,7 @@ MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION
 
 - Stripe Payment Link is the current Stripe path.
 - Products without Stripe keep BOOTH links when available.
-- Products without Stripe or BOOTH remain in preparing state.
+- Products without a current purchase or acquisition route are not listed on the public Store shelf.
 - Automatic post-purchase `download_url` issuing is not implemented yet.
 - GitHub Release and BOOTH may be used together as download or distribution guidance.
 - Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
@@ -84,7 +84,7 @@ Phase 9 adjusted the public Store presentation layer only.
 
 - Product data still comes from `store_products.generated.json`.
 - Product names, prices, descriptions, Stripe URLs, and BOOTH URLs are not hand-edited in this repo.
-- Purchase actions are rendered in this priority: Stripe Payment Link, BOOTH, preparing.
+- Purchase actions are rendered from current Stripe Payment Link, BOOTH, or download routes. Products with no route are not listed.
 - Footer navigation links `/legal/`, `/privacy/`, and `/terms/` are present across the Store pages.
 
 ## Visual Tone Refinement
@@ -94,7 +94,7 @@ The public Store UI is kept close to DAKE's quiet white/black presentation.
 - Top-page internal source wording is not shown to general users.
 - Product cards keep images and tags in separate normal-flow areas.
 - Product detail pages avoid exposing internal fields such as payment status, raw payment links, download URLs, and source paths.
-- Purchase actions remain data-driven: Stripe Payment Link, BOOTH, then preparing.
+- Purchase actions remain data-driven: Stripe Payment Link, BOOTH, or an existing download route.
 ## Visual Layout Refinement
 
 The Store presentation keeps a quiet shelf layout rather than a sales landing page.
