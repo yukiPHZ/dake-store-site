@@ -32,7 +32,9 @@ Stripe Payment Link is the Store purchase path.
 - `stripe_payment_link` is read from generated JSON.
 - Products without `stripe_payment_link` are hidden from the public Store shelf even when BOOTH or download data exists.
 - Stripe Secret Key must never be placed in this static site.
-- Pages Functions, Checkout API, Webhook, R2, and post-purchase downloads are later phases.
+- Single Desktop delivery uses `/download/`, Pages Functions, Stripe Checkout Session read-back, and the private `DAKE_DESKTOP_RELEASES` R2 binding.
+- `STRIPE_SECRET_KEY` is configured only as a Cloudflare Secret. Do not place it in `wrangler.toml`, HTML, JavaScript, generated JSON, or Markdown.
+- The current P2 implementation allowlists `DAKE_Mail_Draft` as a pilot mapping to `desktop/DAKE_Mail_Draft/current.zip`. Production binding, object upload, Payment Link redirect update, and deployment are separate explicit operations.
 
 ## Repository And Deployment
 
@@ -59,7 +61,7 @@ MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION
 - Stripe Payment Link is the current Stripe path.
 - Only Stripe-ready products with a Payment Link are listed on the public Store shelf.
 - BOOTH remains an independent sales channel and is not rendered as a Store purchase alternative.
-- Automatic post-purchase `download_url` issuing is not implemented yet.
+- Eligible single Desktop products are verified from Stripe server-side and downloaded from private R2; no public `download_url` is issued.
 - Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
 
 Do not place Stripe Secret Key, Webhook Secret, or API keys in this static site.
