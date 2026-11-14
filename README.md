@@ -7,7 +7,7 @@ Public HTML uses the shared DAKE navigation from `https://dakeapp.com/assets/`
 and keeps a plain `すべてのDAKE` fallback. Run the central installer when adding
 a page: `node ..\dakeapp-site\scripts\apply-dake-network.js public`.
 
-DAKE Store is a static sales-view MVP for DAKE products.
+DAKE Store is a static sales shelf for DAKE products that are ready to purchase through Stripe.
 
 This site is not the source of truth. Product information is derived from each product's `ORIGINAL.md` through `store_products.generated.json`.
 
@@ -18,22 +18,19 @@ This site is not the source of truth. Product information is derived from each p
 - Do not edit generated JSON manually.
 - To update product information, update the source `ORIGINAL.md`, regenerate the JSON in `DAKE_series`, then copy it here.
 
-## MVP Scope
+## Public Shelf
 
-- Static product list
-- Static product detail view
-- BOOTH links when available
-- No Stripe Checkout yet
-- No Cloudflare Pages Functions yet
-- No direct download URL issuing yet
+- Public products satisfy `status == available`, `payment_status == stripe_ready`, and have `stripe_payment_link`.
+- `booth_only`, `preparing`, `free_download`, and `not_for_sale` items may remain in generated JSON but are not public Store products.
+- BOOTH, GitHub Release, and `download_url` are not Store listing conditions or alternative purchase buttons.
+- Stripe Secret Key is never placed in this static site.
 
 ## Stripe Payment Link
 
-The MVP prefers Stripe Payment Link before adding Checkout API or Pages Functions.
+Stripe Payment Link is the Store purchase path.
 
 - `stripe_payment_link` is read from generated JSON.
-- Products without `stripe_payment_link` keep the BOOTH link when available.
-- Products without a Stripe, BOOTH, or download route stay in canonical data but are hidden from the public Store shelf.
+- Products without `stripe_payment_link` are hidden from the public Store shelf even when BOOTH or download data exists.
 - Stripe Secret Key must never be placed in this static site.
 - Pages Functions, Checkout API, Webhook, R2, and post-purchase downloads are later phases.
 
@@ -60,10 +57,9 @@ The custom domain is added from the Cloudflare Pages project settings after the 
 MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION_RULE.md`.
 
 - Stripe Payment Link is the current Stripe path.
-- Products without Stripe keep BOOTH links when available.
-- Products without a current purchase or acquisition route are not listed on the public Store shelf.
+- Only Stripe-ready products with a Payment Link are listed on the public Store shelf.
+- BOOTH remains an independent sales channel and is not rendered as a Store purchase alternative.
 - Automatic post-purchase `download_url` issuing is not implemented yet.
-- GitHub Release and BOOTH may be used together as download or distribution guidance.
 - Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
 
 Do not place Stripe Secret Key, Webhook Secret, or API keys in this static site.
@@ -84,7 +80,7 @@ Phase 9 adjusted the public Store presentation layer only.
 
 - Product data still comes from `store_products.generated.json`.
 - Product names, prices, descriptions, Stripe URLs, and BOOTH URLs are not hand-edited in this repo.
-- Purchase actions are rendered from current Stripe Payment Link, BOOTH, or download routes. Products with no route are not listed.
+- Purchase actions use the current Stripe Payment Link. Non-Stripe routes are not rendered as purchase alternatives.
 - Footer navigation links `/legal/`, `/privacy/`, and `/terms/` are present across the Store pages.
 
 ## Visual Tone Refinement
@@ -94,7 +90,7 @@ The public Store UI is kept close to DAKE's quiet white/black presentation.
 - Top-page internal source wording is not shown to general users.
 - Product cards keep images and tags in separate normal-flow areas.
 - Product detail pages avoid exposing internal fields such as payment status, raw payment links, download URLs, and source paths.
-- Purchase actions remain data-driven: Stripe Payment Link, BOOTH, or an existing download route.
+- Purchase actions remain data-driven by the canonical Stripe Payment Link.
 ## Visual Layout Refinement
 
 The Store presentation keeps a quiet shelf layout rather than a sales landing page.

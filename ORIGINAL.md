@@ -10,13 +10,13 @@
 
 ## Role
 
-DAKE Store is the quiet distribution and sales shelf for DAKE products. Release
-and BOOTH links remain parallel; the site must not become a loud sales landing
-page.
+DAKE Store is the quiet sales shelf for DAKE products that are ready to purchase
+through Stripe. The site must not become a loud sales landing page.
 
-The public shelf shows only products with a current Stripe, BOOTH, or download
-route. Products that exist in canonical data but cannot yet be purchased or
-obtained stay out of the Store list until a source-confirmed route exists.
+The public shelf shows only products whose canonical data is `available`, whose
+`payment_status` is `stripe_ready`, and whose Stripe Payment Link exists. BOOTH
+is a parallel sales channel, not a public Store shelf condition. Products may
+remain in generated data without being public Store products.
 
 ## Technical Boundaries
 
