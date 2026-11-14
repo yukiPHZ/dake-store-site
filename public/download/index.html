@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>購入完了 | DAKE Store</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+  </head>
+  <body class="download-page">
+    <header class="site-header download-header">
+      <h1><a class="site-title" href="/">DAKE Store</a></h1>
+    </header>
+
+    <main class="download-main">
+      <section class="download-panel" aria-live="polite">
+        <div id="download-pending">
+          <p class="download-kicker">購入完了</p>
+          <h2>お支払いを確認しています。</h2>
+        </div>
+
+        <div id="download-ready" hidden>
+          <p class="download-kicker">ありがとうございます。</p>
+          <h2 id="download-product">DAKE</h2>
+          <p>購入を確認しました。</p>
+          <p class="download-action"><a id="download-link" class="action-link primary" href="#">ダウンロード</a></p>
+        </div>
+
+        <div id="download-error" hidden>
+          <p class="download-kicker">DAKE Store</p>
+          <h2>購入情報を確認できませんでした。</h2>
+          <p>再度お試しいただくか、サポートをご利用ください。</p>
+          <p class="download-action"><a class="action-link" href="/">Storeへ戻る</a></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/assets/js/download.js"></script>
+  </body>
+</html>
