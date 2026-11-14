@@ -97,33 +97,15 @@ const setStatus = (message) => {
   if (node) node.textContent = message;
 };
 
-const paymentState = (product) => {
-  if (product.stripe_payment_link) {
-    return { label: "Stripe対応", className: "payment-stripe", action: "Stripeで購入" };
-  }
-  if (product.booth_url) {
-    return { label: "BOOTH", className: "payment-booth", action: "BOOTHで見る" };
-  }
-  if (product.download_url) {
-    return { label: "ダウンロード", className: "payment-booth", action: "取得する" };
-  }
-  return { label: "取得先なし", className: "payment-preparing", action: "取得先なし" };
-};
+const isPublicProduct = (product) =>
+  product.status === "available" &&
+  product.payment_status === "stripe_ready" &&
+  Boolean(product.stripe_payment_link);
 
 const purchaseAction = (product) => {
-  const links = [];
+  if (!product.stripe_payment_link) return "";
   const trackingAttrs = marketObserverProductAttrs(product);
-  if (product.stripe_payment_link) {
-    links.push(`<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank" ${trackingAttrs}>Stripeで購入</a>`);
-  }
-  if (product.booth_url) {
-    links.push(`<a class="action-link booth" href="${escapeHtml(product.booth_url)}" rel="noopener" target="_blank" ${trackingAttrs}>BOOTHで見る</a>`);
-  }
-  if (product.download_url && product.download_url !== product.booth_url && product.download_url !== product.stripe_payment_link) {
-    links.push(`<a class="action-link" href="${escapeHtml(product.download_url)}" rel="noopener" target="_blank" ${trackingAttrs}>取得する</a>`);
-  }
-  if (links.length) return links.join("");
-  return `<span class="action-link is-disabled" aria-disabled="true">準備中</span>`;
+  return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank" ${trackingAttrs}>購入する</a>`;
 };
 
 const manualDeliveryNotice = (product) => {
@@ -147,9 +129,7 @@ async function loadProducts() {
   const data = await response.json();
   state.sourcePolicy = data.source_policy || "";
   state.doNotEdit = data.do_not_edit === true;
-  state.products = (data.items || []).filter((item) =>
-    item.status === "available" && Boolean(item.stripe_payment_link || item.booth_url || item.download_url)
-  );
+  state.products = (data.items || []).filter(isPublicProduct);
 }
 
 async function loadApps() {
@@ -166,7 +146,6 @@ async function loadApps() {
 function productCard(product) {
   const detailUrl = `/product/?id=${encodeURIComponent(product.id)}`;
   const action = purchaseAction(product);
-  const payment = paymentState(product);
   const trackingAttrs = marketObserverProductAttrs(product);
 
   return `
@@ -176,10 +155,9 @@ function productCard(product) {
         <div class="meta-row">
           <span class="pill">${escapeHtml(typeLabel(product.type))}</span>
           <span class="pill">${escapeHtml(text(product.category, "カテゴリ未設定"))}</span>
-          <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
         </div>
         <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
-        <p>${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
+        <p>${escapeHtml(text(product.catch || product.description, "DAKEの商品です。"))}</p>
         <div class="price">${escapeHtml(yen(product.price))}</div>
         <div class="card-actions">
           <a class="action-link" href="${detailUrl}" data-market-observer-event="select_item" ${trackingAttrs}>詳細</a>
@@ -276,7 +254,6 @@ function renderDetail() {
   document.title = `${text(product.title)} | DAKE Store`;
   const action = purchaseAction(product);
   const detailLink = detailAction(product);
-  const payment = paymentState(product);
   const tags = tagList(product.tags);
   const version = nullish(product.version) ? "" : `<span class="pill">v${escapeHtml(text(product.version))}</span>`;
   const disclaimer = text(product.disclaimer, "各ツールは作業補助を目的としたものです。重要なファイルは事前にバックアップしてください。");
@@ -288,18 +265,17 @@ function renderDetail() {
         <span class="pill">${escapeHtml(typeLabel(product.type))}</span>
         <span class="pill">${escapeHtml(text(product.category, "カテゴリ未設定"))}</span>
         ${version}
-        <span class="pill payment-pill ${payment.className}">${escapeHtml(payment.label)}</span>
       </div>
       <h2>${escapeHtml(text(product.title, "商品名未設定"))}</h2>
-      <p class="detail-catch">${escapeHtml(text(product.catch || product.description, "説明準備中"))}</p>
+      <p class="detail-catch">${escapeHtml(text(product.catch || product.description, "DAKEの商品です。"))}</p>
       <div class="price">${escapeHtml(yen(product.price))}</div>
       ${tags}
       <div class="detail-actions">${detailLink}${action}</div>
       ${manualDeliveryNotice(product)}
-      <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。一部の商品はBOOTHでの配布を併用しています。</p>
+      <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。</p>
       <div class="detail-copy">
         <h3>説明</h3>
-        <p>${escapeHtml(text(product.description, "説明準備中"))}</p>
+        <p>${escapeHtml(text(product.description, "DAKEの商品です。"))}</p>
         <h3>注意事項</h3>
         <p>${escapeHtml(disclaimer)}</p>
       </div>
@@ -322,4 +298,10 @@ async function main() {
   }
 }
 
-main();
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { state, isPublicProduct, purchaseAction, productCard, findProduct };
+}
+
+if (typeof document !== "undefined") {
+  main();
+}
