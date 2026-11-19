@@ -1,2 +1,6 @@
 name = "dake-store-site"
 pages_build_output_dir = "public"
+
+[[r2_buckets]]
+binding = "DAKE_DESKTOP_RELEASES"
+bucket_name = "dake-desktop-releases"
