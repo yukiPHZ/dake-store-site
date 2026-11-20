@@ -6,7 +6,7 @@
 - Repository: `dake-store-site`
 - Cloudflare Pages project: `dake-store-site`
 - Public root: `public/`
-- State: beta
+- State: public
 
 ## Role
 
@@ -40,6 +40,12 @@ Single Desktop DAKE purchases may redirect to `/download/?session_id={CHECKOUT_S
 - Shared assets are served from `https://dakeapp.com/assets/`.
 - Every public HTML page keeps a plain `すべてのDAKE` fallback link.
 - Do not maintain a separate network list in this repository.
+
+## Navigation Boundary
+
+- Store is public and appears in the shared DAKE global footer.
+- Store's existing local header, product display, purchase paths, Stripe URLs,
+  and delivery flow are outside this navigation change and remain unchanged.
 
 ## Protected
 
