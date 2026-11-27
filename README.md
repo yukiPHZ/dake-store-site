@@ -25,16 +25,17 @@ This site is not the source of truth. Product information is derived from each p
 - BOOTH, GitHub Release, and `download_url` are not Store listing conditions or alternative purchase buttons.
 - Stripe Secret Key is never placed in this static site.
 
-## Stripe Payment Link
+## Stripe Payment Link & Private R2 Delivery
 
-Stripe Payment Link is the Store purchase path.
+Stripe Payment Link + Cloudflare Pages Functions + private Cloudflare R2 (`dake-desktop-releases`) is the official Store purchase and delivery path.
 
-- `stripe_payment_link` is read from generated JSON.
+- `stripe_payment_link` is read from `public/assets/data/store_products.generated.json`.
 - Products without `stripe_payment_link` are hidden from the public Store shelf even when BOOTH or download data exists.
 - Stripe Secret Key must never be placed in this static site.
-- Single Desktop delivery uses `/download/`, Pages Functions, Stripe Checkout Session read-back, and the private `DAKE_DESKTOP_RELEASES` R2 binding.
+- Paid Desktop apps and Packs use `/download/?session_id={CHECKOUT_SESSION_ID}`, Pages Functions (`functions/api/download-status.js`, `functions/api/download.js`, `functions/_lib/private-download.mjs`), server-side Stripe Checkout Session + Payment Link verification, and the private `DAKE_DESKTOP_RELEASES` R2 binding (`dake-desktop-releases`, key `desktop/<id>/current.zip`).
 - `STRIPE_SECRET_KEY` is configured only as a Cloudflare Secret. Do not place it in `wrangler.toml`, HTML, JavaScript, generated JSON, or Markdown.
-- The current P2 implementation allowlists `DAKE_Mail_Draft` as a pilot mapping to `desktop/DAKE_Mail_Draft/current.zip`. Production binding, object upload, Payment Link redirect update, and deployment are separate explicit operations.
+- Wave 1 (all 47 public Store items: desktop apps and Packs) is allowlisted in `DESKTOP_DELIVERIES` (`functions/_lib/private-download.mjs`) and served from private R2 `desktop/<id>/current.zip`.
+- Free public GitHub Release asset distribution is limited strictly to `DakePDF結合` (`DAKE_PDF_Merge`), which also has a 500 JPY supporter edition (`dake_pdf_merge`) in Store. All other paid apps and Packs keep only release tags/notes on GitHub and are distributed via DAKE Store (Stripe + R2) and BOOTH in parallel.
 
 ## Repository And Deployment
 
@@ -56,12 +57,12 @@ The custom domain is added from the Cloudflare Pages project settings after the 
 `wrangler.toml` keeps the Pages output directory explicit.
 ## Purchase Operations
 
-MVP purchase operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION_RULE.md`.
+Current purchase and private delivery operations are defined in `DAKE_series/00_core/DAKE_STORE_OPERATION_RULE.md`.
 
-- Stripe Payment Link is the current Stripe path.
+- Stripe Payment Link is the Store purchase path.
 - Only Stripe-ready products with a Payment Link are listed on the public Store shelf.
-- BOOTH remains an independent sales channel and is not rendered as a Store purchase alternative.
-- Eligible single Desktop products are verified from Stripe server-side and downloaded from private R2; no public `download_url` is issued.
+- BOOTH remains an independent parallel sales channel and is not rendered as a Store purchase alternative.
+- All eligible Desktop apps and Packs in `DESKTOP_DELIVERIES` are verified from Stripe server-side and delivered automatically from private R2 (`desktop/<id>/current.zip`); no public `download_url` is issued.
 - Refunds, support, redistribution limits, and disclaimers follow the shared DAKE Store operation rule.
 
 Do not place Stripe Secret Key, Webhook Secret, or API keys in this static site.
