@@ -108,12 +108,44 @@ const purchaseAction = (product) => {
   return `<a class="action-link primary" href="${escapeHtml(product.stripe_payment_link)}" rel="noopener" target="_blank" ${trackingAttrs}>購入する</a>`;
 };
 
-const manualDeliveryNotice = (product) => {
-  if (product.type !== "pack" || !product.stripe_payment_link) return "";
+const isPackProduct = (product) =>
+  Boolean(product && (product.type === "pack" || product.type === "shimarisu_pack"));
+
+const deliveryNotice = (product) => {
+  if (!product || !product.stripe_payment_link) return "";
+  if (isPackProduct(product)) {
+    return `
+      <p class="purchase-note">
+        Stripe決済完了後の案内ページからPack ZIPをダウンロードできます。ZIPを解凍してご利用ください。
+      </p>
+    `;
+  }
   return `
     <p class="purchase-note">
-      このPackは自動ダウンロードではありません。Stripe決済確認後、購入時のメールアドレス宛に次営業日以内にダウンロード方法をご案内します。
+      Stripe決済完了後の案内ページからZIPをダウンロードできます。
     </p>
+  `;
+};
+
+const formatMultiline = (value, fallback = "未設定") =>
+  escapeHtml(text(value, fallback)).replaceAll("\n", "<br>");
+
+const includedItemsSection = (product) => {
+  const items = Array.isArray(product && product.included_items) ? product.included_items : [];
+  if (!items.length) return "";
+  const listItems = items
+    .map((entry) => {
+      const name = entry.item || entry.name || entry.folder || "";
+      const role = entry.role || "";
+      if (!name) return "";
+      return `<li><strong>${escapeHtml(name)}</strong>${role ? ` — ${escapeHtml(role)}` : ""}</li>`;
+    })
+    .filter(Boolean)
+    .join("");
+  if (!listItems) return "";
+  return `
+    <h3>同梱アプリ・構成物</h3>
+    <ul class="included-list">${listItems}</ul>
   `;
 };
 
@@ -271,13 +303,13 @@ function renderDetail() {
       <div class="price">${escapeHtml(yen(product.price))}</div>
       ${tags}
       <div class="detail-actions">${detailLink}${action}</div>
-      ${manualDeliveryNotice(product)}
-      <p class="purchase-note">購入後の案内は、決済サービスまたは商品ページの案内に従ってください。</p>
+      ${deliveryNotice(product)}
       <div class="detail-copy">
         <h3>説明</h3>
-        <p>${escapeHtml(text(product.description, "DAKEの商品です。"))}</p>
+        <p>${formatMultiline(product.description, "DAKEの商品です。")}</p>
+        ${includedItemsSection(product)}
         <h3>注意事項</h3>
-        <p>${escapeHtml(disclaimer)}</p>
+        <p>${formatMultiline(disclaimer)}</p>
       </div>
     </section>
   `;
@@ -299,7 +331,16 @@ async function main() {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { state, isPublicProduct, purchaseAction, productCard, findProduct };
+  module.exports = {
+    state,
+    isPublicProduct,
+    isPackProduct,
+    purchaseAction,
+    deliveryNotice,
+    includedItemsSection,
+    productCard,
+    findProduct,
+  };
 }
 
 if (typeof document !== "undefined") {

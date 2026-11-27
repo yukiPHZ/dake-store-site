@@ -20,13 +20,13 @@ remain in generated data without being public Store products.
 
 ## Purchase Delivery
 
-Single Desktop DAKE purchases may redirect to `/download/?session_id={CHECKOUT_SESSION_ID}`. A Pages Function retrieves the Checkout Session and its Payment Link from Stripe, verifies live mode, paid status, `metadata.dake_item_id`, the Desktop delivery allowlist, and the private R2 object before returning a ZIP.
+Desktop DAKE apps and Packs redirect to `/download/?session_id={CHECKOUT_SESSION_ID}`. A Pages Function retrieves the Checkout Session and its Payment Link from Stripe, verifies live mode, paid status, `metadata.dake_item_id`, the delivery allowlist, and the private R2 object before returning a ZIP.
 
 - The browser supplies only the Checkout Session ID.
 - `STRIPE_SECRET_KEY` exists only as a Cloudflare Secret.
 - `DAKE_DESKTOP_RELEASES` is a private R2 binding. It has no public URL.
 - The server maps `dake_item_id` to `desktop/<product_id>/current.zip`; client-supplied product IDs, object keys, filenames, and prices are ignored.
-- Pack delivery remains `manual_email_private_download`.
+- Continuing Packs (`DAKE_Pack_Document`, `DAKE_Pack_Mail`, `SHIMARISU_Pack`) and single Desktop apps use the same private R2 delivery flow.
 
 ## Technical Boundaries
 

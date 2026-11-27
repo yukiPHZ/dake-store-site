@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  DESKTOP_DELIVERIES,
   handleDownload,
   handleDownloadStatus,
 } from "../functions/_lib/private-download.mjs";
@@ -127,17 +128,20 @@ test("missing DAKE metadata is rejected", async () => {
   assert.deepEqual(r2.calls, []);
 });
 
-test("unknown product and Pack are outside the Desktop allowlist", async () => {
-  for (const itemId of ["unknown_product", "DAKE_Pack_Mail"]) {
+test("unknown, discontinued, and manual-delivery items are rejected", async () => {
+  for (const [itemId, deliveryMethod] of [
+    ["unknown_product", "stripe_session_private_r2"],
+    ["DAKE_Pack_Memo", "stripe_session_private_r2"],
+    ["dake_mail_kikuta", "stripe_session_private_r2"],
+    ["dake_pdf_merge_mini", "stripe_session_private_r2"],
+    ["DAKE_Pack_Mail", "manual_email_private_download"],
+  ]) {
     const stripe = stripeFetch({
       sessionValue: session({ metadata: { dake_item_id: itemId } }),
       paymentLinkValue: paymentLink({
         metadata: {
           dake_item_id: itemId,
-          purchase_delivery_method:
-            itemId === "DAKE_Pack_Mail"
-              ? "manual_email_private_download"
-              : "stripe_session_private_r2",
+          purchase_delivery_method: deliveryMethod,
         },
       }),
     });
@@ -145,6 +149,35 @@ test("unknown product and Pack are outside the Desktop allowlist", async () => {
     const response = await handleDownload(request(), r2.env, stripe.fetch);
     assert.equal(response.status, 403);
     assert.deepEqual(r2.calls, []);
+  }
+});
+
+test("all 47 catalog products (including continuing Packs and supporter edition) are allowlisted for private R2 delivery", async () => {
+  const catalog = JSON.parse(
+    await readFile(new URL("../public/assets/data/store_products.generated.json", import.meta.url), "utf8"),
+  );
+  assert.equal(Object.keys(DESKTOP_DELIVERIES).length, 47);
+  for (const item of catalog.items) {
+    const entry = DESKTOP_DELIVERIES[item.id];
+    assert.ok(entry, `Missing DESKTOP_DELIVERIES entry for ${item.id}`);
+    assert.equal(entry.objectKey, `desktop/${item.id}/current.zip`);
+    assert.equal(entry.fileName, `${item.id}.zip`);
+  }
+
+  for (const itemId of ["DAKE_Pack_Document", "DAKE_Pack_Mail", "SHIMARISU_Pack", "dake_pdf_merge"]) {
+    const stripe = stripeFetch({
+      sessionValue: session({ metadata: { dake_item_id: itemId } }),
+      paymentLinkValue: paymentLink({
+        metadata: {
+          dake_item_id: itemId,
+          purchase_delivery_method: "stripe_session_private_r2",
+        },
+      }),
+    });
+    const r2 = environment();
+    const response = await handleDownload(request(), r2.env, stripe.fetch);
+    assert.equal(response.status, 200);
+    assert.deepEqual(r2.calls, [["get", `desktop/${itemId}/current.zip`]]);
   }
 });
 

@@ -3,7 +3,10 @@ const assert = require("node:assert/strict");
 const {
   state,
   isPublicProduct,
+  isPackProduct,
   purchaseAction,
+  deliveryNotice,
+  includedItemsSection,
   productCard,
   findProduct,
 } = require("../public/assets/js/store.js");
@@ -81,5 +84,49 @@ assert.equal(purchaseAction(boothOnly), "");
 
 const card = productCard(stripeReady);
 assert.doesNotMatch(card, /Stripe対応|payment-pill|BOOTHで見る|取得する/);
+
+assert.equal(generated.items.length, 47);
+
+const discontinuedIds = [
+  "DAKE_Pack_Memo",
+  "dake_mail_kikuta",
+  "dake_booth_assist",
+  "video_shorts_cut",
+  "dake_pdf_merge_mini",
+  "dake_image_receiver",
+  "DAKE_App_Doko",
+  "dake_launcher",
+  "game_alien_road",
+  "game_diver_catch",
+];
+for (const discontinuedId of discontinuedIds) {
+  assert.equal(
+    generated.items.some((item) => item.id === discontinuedId),
+    false,
+    `Discontinued product should not be in catalog: ${discontinuedId}`,
+  );
+}
+
+const shimarisu = generated.items.find((item) => item.id === "SHIMARISU_Pack");
+assert.ok(shimarisu);
+assert.equal(isPackProduct(shimarisu), true);
+assert.match(deliveryNotice(shimarisu), /Pack ZIPをダウンロード/);
+assert.match(includedItemsSection(shimarisu), /ShimarisuKun\.exe/);
+
+const packMail = generated.items.find((item) => item.id === "DAKE_Pack_Mail");
+assert.ok(packMail);
+assert.equal(isPackProduct(packMail), true);
+assert.equal(packMail.included_items.length, 3);
+assert.match(includedItemsSection(packMail), /Dakeメールリスト/);
+assert.match(includedItemsSection(packMail), /Dakeメール下書き/);
+
+const pdfMerge = generated.items.find((item) => item.id === "dake_pdf_merge");
+assert.ok(pdfMerge);
+assert.match(pdfMerge.title, /応援購入版/);
+assert.match(pdfMerge.description, /無料配布版と同一機能/);
+
+const batchPdf = generated.items.find((item) => item.id === "DAKE_Image_BatchPDF");
+assert.ok(batchPdf);
+assert.equal(batchPdf.status, "available");
 
 console.log("store-policy=passed");
